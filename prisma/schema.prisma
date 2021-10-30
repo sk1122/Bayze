@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://sk1122:satyam%23789@127.0.0.1:5432/bayze"
+}
+
+model access_token {
+  id           Int     @id() @default(autoincrement())
+  access_token String  @db.VarChar
+  provider     String? @db.VarChar
+  userId       String  
+  users        users   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model admin {
+  id             Int           @id() @default(autoincrement())
+  create_date    DateTime      @default(now()) @db.Timestamp(6)
+  update_column  DateTime      @default(now()) @db.Timestamp(6)
+  is_active      Boolean       @default(true)
+  organizationId Int?
+  organization   organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  userId         String       @unique()
+  users          users        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model employee {
+  id             Int           @id() @default(autoincrement())
+  create_date    DateTime      @default(now()) @db.Timestamp(6)
+  update_column  DateTime      @default(now()) @db.Timestamp(6)
+  is_active      Boolean       @default(true)
+  organizationId Int?
+  organization   organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  userId         String        @unique()
+  users          users         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model organization {
+  id            Int        @id() @default(autoincrement())
+  name          String     @db.VarChar
+  address       Json?     @default("{\"city\":\"\",\"state\":\"\",\"country\":\"\"}")
+  email         String     @db.VarChar
+  phone_number  String?    @db.VarChar
+  website       String?    @db.VarChar
+  create_date   DateTime   @default(now()) @db.Timestamp(6)
+  update_column DateTime   @default(now()) @db.Timestamp(6)
+  is_active     Boolean    @default(true)
+  admin         admin[]
+  employee      employee[]
+}
+
+model page {
+  id            Int      @id() @default(autoincrement())
+  access_token  String?  @db.VarChar
+  page_id       String   @db.VarChar
+  name          String   @db.VarChar
+  business      Json?
+  category      String   @db.VarChar
+  category_list Json[]
+  tasks         String[]
+  create_date   DateTime @default(now()) @db.Timestamp(6)
+  update_column DateTime @default(now()) @db.Timestamp(6)
+  userId        String   
+  users         users    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model social_account {
+  id          Int     @id() @default(autoincrement())
+  provider_id String? @db.VarChar
+  username    String? @db.VarChar
+  displayName String? @db.VarChar
+  gender      String? @db.VarChar
+  profileURL  String? @db.VarChar
+  photos      String? @db.VarChar
+  email       String? @db.VarChar @unique()
+  json        Json?
+  provider    String? @db.VarChar
+  userId      String  @unique()
+  users       users   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model users {
+  id                 String          @id() @default(uuid())
+  email              String          @unique() @db.VarChar
+  password           String          @db.VarChar
+  role               String[]        
+  is_accepted_to_org Boolean         @default(false)
+  create_date        DateTime        @default(now()) @db.Timestamp(6)
+  update_column      DateTime        @default(now()) @db.Timestamp(6)
+  is_active          Boolean         @default(true)
+  access_token       access_token[]
+  admin              admin?
+  employee           employee?
+  page               page[]
+  social_account     social_account?
+}
