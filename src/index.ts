@@ -8,6 +8,7 @@ import {Connection, getConnection} from "typeorm";
 import { adoneRouter } from "./adone/router"
 import { authRouter } from "./authentication/router"
 import { organizationRouter } from "./organization/router"
+import { projectRouter } from "./projects/router"
 
 dotenv.config()
 
@@ -38,10 +39,10 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use("/api/accounts/", authRouter)
-connection.then(() => {
-	app.use("/api/", adoneRouter)
-	app.use("/api/organization/", organizationRouter)
-})
+app.use("/api/", adoneRouter)
+app.use("/api/organization/", organizationRouter)
+app.use("/api/project/", projectRouter)
+
 
 server.listen(PORT, () => {
 	console.log(`Listening on PORT ${PORT}`)
